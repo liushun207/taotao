@@ -13,10 +13,10 @@
     <artifactId>taotao-manager</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>taotao-manage-pojo</module>
-        <module>taotao-manager-mapper</module>
-        <module>taotao-manager-service</module>
-        <module>taotao-manager-web</module>
+        <module>../taotao-manage-pojo</module>
+        <module>../taotao-manager-mapper</module>
+        <module>../taotao-manager-service</module>
+        <module>../taotao-manager-web</module>
     </modules>
 
     <dependencies>
