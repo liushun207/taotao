@@ -12,7 +12,7 @@
     <artifactId>taotao-manager-web</artifactId>
     <packaging>war</packaging>
 
-    <name>taotao-manager-web Maven Webapp</name>
+    <name>taotao-manager-web</name>
     <!-- FIXME change it to the project's website -->
     <url>http://www.example.com</url>
 
@@ -51,6 +51,7 @@
             <artifactId>jsp-api</artifactId>
             <scope>provided</scope>
         </dependency>
+
         <!-- 文件上传组件 -->
         <dependency>
             <groupId>commons-fileupload</groupId>
