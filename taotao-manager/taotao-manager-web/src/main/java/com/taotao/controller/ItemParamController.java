@@ -21,21 +21,23 @@ import com.taotao.service.ItemParamService;
  */
 @Controller
 @RequestMapping("/item/param")
-public class ItemParamController {
-
+public class ItemParamController
+{
 	@Autowired
 	private ItemParamService itemParamService;
-	
+
 	@RequestMapping("/query/itemcatid/{itemCatId}")
 	@ResponseBody
-	public TaotaoResult getItemParamByCid(@PathVariable Long itemCatId) {
+	public TaotaoResult getItemParamByCid(@PathVariable Long itemCatId)
+	{
 		TaotaoResult result = itemParamService.getItemParamByCid(itemCatId);
 		return result;
 	}
-	
+
 	@RequestMapping("/save/{cid}")
 	@ResponseBody
-	public TaotaoResult insertItemParam(@PathVariable Long cid, String paramData) {
+	public TaotaoResult insertItemParam(@PathVariable Long cid, String paramData)
+	{
 		//创建pojo对象
 		TbItemParam itemParam = new TbItemParam();
 		itemParam.setItemCatId(cid);

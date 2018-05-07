@@ -17,19 +17,21 @@ import com.taotao.service.ItemCatService;
  * 商品分类管理
  * <p>Title: ItemCatServiceImpl</p>
  * <p>Description: </p>
- * <p>Company: www.itcast.com</p> 
+ * <p>Company: www.itcast.com</p>
+ *
  * @author
- * @date	2015年9月4日上午9:16:50
  * @version 1.0
+ * @date 2015年9月4日上午9 :16:50
  */
 @Service
-public class ItemCatServiceImpl implements ItemCatService {
-
+public class ItemCatServiceImpl implements ItemCatService
+{
 	@Autowired
 	private TbItemCatMapper itemCatMapper;
+
 	@Override
-	public List<EUTreeNode> getCatList(long parentId) {
-		
+	public List<EUTreeNode> getCatList(long parentId)
+	{
 		//创建查询条件
 		TbItemCatExample example = new TbItemCatExample();
 		Criteria criteria = example.createCriteria();
@@ -38,15 +40,15 @@ public class ItemCatServiceImpl implements ItemCatService {
 		List<TbItemCat> list = itemCatMapper.selectByExample(example);
 		List<EUTreeNode> resultList = new ArrayList<>();
 		//把列表转换成treeNodelist
-		for (TbItemCat tbItemCat : list) {
+		for (TbItemCat tbItemCat : list)
+		{
 			EUTreeNode node = new EUTreeNode();
 			node.setId(tbItemCat.getId());
 			node.setText(tbItemCat.getName());
-			node.setState(tbItemCat.getIsParent()?"closed":"open");
+			node.setState(tbItemCat.getIsParent() ? "closed" : "open");
 			resultList.add(node);
 		}
 		//返回结果
 		return resultList;
 	}
-
 }

@@ -22,6 +22,8 @@ import com.taotao.pojo.TbItemExample.Criteria;
 import com.taotao.pojo.TbItemParamItem;
 import com.taotao.service.ItemService;
 
+import javax.swing.plaf.synth.Region;
+
 /**
  * 商品管理Service
  * <p>Title: ItemServiceImpl</p>
@@ -68,7 +70,7 @@ public class ItemServiceImpl implements ItemService
      * @param page
      * @param rows
      * @return
-     * @see com.taotao.service.ItemService#getItemList(long, long)
+     * @see com.taotao.service.ItemService#getItemList(int, int)
      */
     @Override
     public EUDataGridResult getItemList(int page, int rows)
@@ -76,13 +78,19 @@ public class ItemServiceImpl implements ItemService
         //查询商品列表
         TbItemExample example = new TbItemExample();
 
-        Criteria criteria = example.createCriteria();
+        //#region 测试其它条件
 
-        long cid = 76;
-        criteria.andCidEqualTo(cid);
+        //Criteria criteria = example.createCriteria();
 
-        byte status = 1;
-        criteria.andStatusEqualTo(status);
+        // 测试
+        //long cid = 76;
+        //criteria.andCidEqualTo(cid);
+
+        // 测试
+        //byte status = 1;
+        //criteria.andStatusEqualTo(status);
+
+        //#endregion
 
         //分页处理
         PageHelper.startPage(page, rows);

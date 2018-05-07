@@ -15,21 +15,23 @@ import com.taotao.service.ItemCatService;
  * 商品分类管理controller
  * <p>Title: ItemCatController</p>
  * <p>Description: </p>
- * <p>Company: www.itcast.com</p> 
+ * <p>Company: www.itcast.com</p>
+ *
  * @author
- * @date
  * @version 1.0
+ * @date
  */
 @Controller
 @RequestMapping("/item/cat")
-public class ItemCatController {
-
+public class ItemCatController
+{
 	@Autowired
 	private ItemCatService itemCatService;
-	
+
 	@RequestMapping("/list")
 	@ResponseBody
-	private List<EUTreeNode> getCatList(@RequestParam(value="id",defaultValue="0")Long parentId) {
+	private List<EUTreeNode> getCatList(@RequestParam(value = "id", defaultValue = "0") Long parentId)
+	{
 		List<EUTreeNode> list = itemCatService.getCatList(parentId);
 		return list;
 	}
