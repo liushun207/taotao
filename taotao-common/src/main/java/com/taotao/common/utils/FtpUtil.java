@@ -19,7 +19,7 @@ import org.apache.commons.net.ftp.FTPReply;
  * <p>Description: </p>
  * <p>Company: www.itcast.com</p> 
  * @author
- * @date	2015年7月29日下午8:11:51
+ * @date
  * @version 1.0
  */
 public class FtpUtil
@@ -127,7 +127,13 @@ public class FtpUtil
 		return result;
 	}
 
-	//远程FTP服务器创建多级目录，创建目录失败或发生异常则返回false
+	/**
+	 * 远程FTP服务器创建多级目录
+	 *
+	 * @param ftp            FTPClient服务
+	 * @param multiDirectory 目录
+	 * @return 创建目录失败或发生异常则返回false
+	 */
 	public static boolean createMultiDirectory(FTPClient ftp, String multiDirectory)
 	{
 		boolean bool = false;

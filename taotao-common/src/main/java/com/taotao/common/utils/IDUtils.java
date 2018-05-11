@@ -11,12 +11,14 @@ import java.util.Random;
  * @date	2015年7月22日下午2:32:10
  * @version 1.0
  */
-public class IDUtils {
+public class IDUtils
+{
 
 	/**
 	 * 图片名生成
 	 */
-	public static String genImageName() {
+	public static String genImageName()
+	{
 		//取当前时间的长整形值包含毫秒
 		long millis = System.currentTimeMillis();
 		//long millis = System.nanoTime();
@@ -25,14 +27,15 @@ public class IDUtils {
 		int end3 = random.nextInt(999);
 		//如果不足三位前面补0
 		String str = millis + String.format("%03d", end3);
-		
+
 		return str;
 	}
-	
+
 	/**
 	 * 商品id生成
 	 */
-	public static long genItemId() {
+	public static long genItemId()
+	{
 		//取当前时间的长整形值包含毫秒
 		long millis = System.currentTimeMillis();
 		//long millis = System.nanoTime();
@@ -44,9 +47,10 @@ public class IDUtils {
 		long id = new Long(str);
 		return id;
 	}
-	
-	public static void main(String[] args) {
-		for(int i=0;i< 100;i++)
-		System.out.println(genItemId());
+
+	public static void main(String[] args)
+	{
+		for (int i = 0; i < 100; i++)
+			System.out.println(genItemId());
 	}
 }
