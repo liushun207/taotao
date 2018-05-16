@@ -1,6 +1,7 @@
 package com.taotao.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -37,5 +38,18 @@ public class PageController
 	public String showpage(@PathVariable String page)
 	{
 		return page;
+	}
+
+	@RequestMapping("/register")
+	public String showRegister()
+	{
+		return "register";
+	}
+
+	@RequestMapping("/login")
+	public String showLogin(String redirect, Model model)
+	{
+		model.addAttribute("redirect", redirect);
+		return "login";
 	}
 }
