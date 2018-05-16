@@ -10,7 +10,6 @@
     <modules>
         <module>taotao-common</module>
         <module>taotao-manager</module>
-        <module>taotao-sso</module>
     </modules>
     <packaging>pom</packaging>
 
