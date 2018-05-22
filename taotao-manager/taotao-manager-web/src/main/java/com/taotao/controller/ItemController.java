@@ -1,5 +1,6 @@
 package com.taotao.controller;
 
+import com.taotao.common.annotations.Auth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +39,7 @@ public class ItemController
 
 	@RequestMapping("/item/list")
 	@ResponseBody
+	@Auth(modelNo = "item", actionNo = "list")
 	public EUDataGridResult getItemList(Integer page, Integer rows)
 	{
 		EUDataGridResult result = itemService.getItemList(page, rows);

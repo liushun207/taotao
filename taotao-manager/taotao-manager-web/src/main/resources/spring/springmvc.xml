@@ -55,5 +55,13 @@
             <mvc:exclude-mapping path="/page/**"/>
             <bean class="com.taotao.interceptor.LoginInterceptor"/>
         </mvc:interceptor>
+
+        <!-- 权限验证拦截器 -->
+        <mvc:interceptor>
+            <!-- /**表示所有url包括子url路径 -->
+            <mvc:mapping path="/**"/>
+
+            <bean class="com.taotao.interceptor.AuthInterceptor"/>
+        </mvc:interceptor>
     </mvc:interceptors>
 </beans>
