@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.pojo.TbUser;
+import org.springframework.beans.factory.annotation.Value;
 
 public interface UserService
 {
@@ -17,4 +18,10 @@ public interface UserService
 	TaotaoResult getUserByToken(String token);
 
 	TbUser getTbUserByToken(String token);
+
+	String getTokenName();
+
+	String getSSOBaseUrl();
+
+	String getSSOPageLogin();
 }

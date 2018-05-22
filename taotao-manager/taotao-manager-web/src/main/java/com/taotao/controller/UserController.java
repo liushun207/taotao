@@ -39,7 +39,6 @@ public class UserController
 	@ResponseBody
 	public Object checkData(@PathVariable String param, @PathVariable Integer type, String callback)
 	{
-
 		TaotaoResult result = null;
 
 		//参数有效性校验

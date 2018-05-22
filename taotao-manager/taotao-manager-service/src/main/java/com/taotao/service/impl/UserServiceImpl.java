@@ -48,7 +48,13 @@ public class UserServiceImpl implements UserService
 	private Integer SSO_SESSION_EXPIRE;
 
 	@Value("${TT_TOKEN}")
-	private String TT_TOKEN;
+	public String TT_TOKEN;
+
+	@Value("${SSO_BASE_URL}")
+	public String SSO_BASE_URL;
+
+	@Value("${SSO_PAGE_LOGIN}")
+	public String SSO_PAGE_LOGIN;
 
 	@Override
 	public TaotaoResult checkData(String content, Integer type)
@@ -177,5 +183,23 @@ public class UserServiceImpl implements UserService
 
 		//返回用户信息
 		return JsonUtils.jsonToPojo(json, TbUser.class);
+	}
+
+	@Override
+	public String getTokenName()
+	{
+		return TT_TOKEN;
+	}
+
+	@Override
+	public String getSSOBaseUrl()
+	{
+		return SSO_BASE_URL;
+	}
+
+	@Override
+	public String getSSOPageLogin()
+	{
+		return SSO_PAGE_LOGIN;
 	}
 }

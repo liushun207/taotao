@@ -4,7 +4,6 @@ import com.taotao.common.utils.CookieUtils;
 import com.taotao.pojo.TbUser;
 import com.taotao.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -18,15 +17,6 @@ public class LoginInterceptor implements HandlerInterceptor
 {
     @Autowired
     private UserService userService;
-
-    @Value("${TT_TOKEN}")
-    private String TT_TOKEN;
-
-    @Value("${SSO_BASE_URL}")
-    private String SSO_BASE_URL;
-
-    @Value("${SSO_PAGE_LOGIN}")
-    private String SSO_PAGE_LOGIN;
 
     /**
      * 执行Handler方法之前执行
@@ -48,7 +38,7 @@ public class LoginInterceptor implements HandlerInterceptor
         //在Handler执行之前处理
         //判断用户是否登录
         //从cookie中取token
-        String token = CookieUtils.getCookieValue(request, TT_TOKEN);
+        String token = CookieUtils.getCookieValue(request,  userService.getTokenName());
 
         //根据token换取用户信息，调用sso系统的接口。
         TbUser user = userService.getTbUserByToken(token);
@@ -57,7 +47,7 @@ public class LoginInterceptor implements HandlerInterceptor
         if (null == user)
         {
             //跳转到登录页面，把用户请求的url作为参数传递给登录页面。
-            response.sendRedirect(SSO_BASE_URL + SSO_PAGE_LOGIN
+            response.sendRedirect(userService.getSSOBaseUrl() + userService.getSSOPageLogin()
                     + "?redirect=" + request.getRequestURL());
             //返回false
             return false;
