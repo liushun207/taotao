@@ -1,17 +1,23 @@
 package com.taotao.controller;
 
 import com.taotao.common.annotations.Auth;
+import com.taotao.common.pojo.ItemObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import com.taotao.common.pojo.EUDataGridResult;
 import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.pojo.TbItem;
 import com.taotao.service.ItemService;
+
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 商品管理Controller
@@ -52,5 +58,34 @@ public class ItemController
 	{
 		TaotaoResult result = itemService.createItem(item, desc, itemParams);
 		return result;
+	}
+
+	@RequestMapping(value = "/item/vali", method = RequestMethod.POST)
+	@ResponseBody
+	// @RequestBody 标注为json格式
+	public TaotaoResult ValidatableItem(@Valid @RequestBody ItemObject item, BindingResult bingingresult) throws Exception
+	{
+		if (bingingresult.hasErrors())
+		{
+			//如果没有通过,跳转提示
+			Map<String, String> map = getErrors(bingingresult);
+		}
+
+		TaotaoResult result = new TaotaoResult();
+		return result;
+	}
+
+	private Map<String, String> getErrors(BindingResult result)
+	{
+		Map<String, String> map = new HashMap<String, String>();
+		List<FieldError> list = result.getFieldErrors();
+		for (FieldError error : list)
+		{
+			System.out.println("error.getField():" + error.getField());
+			System.out.println("error.getDefaultMessage():" + error.getDefaultMessage());
+
+			map.put(error.getField(), error.getDefaultMessage());
+		}
+		return map;
 	}
 }
