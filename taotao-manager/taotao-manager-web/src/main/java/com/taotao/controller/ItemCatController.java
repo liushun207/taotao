@@ -32,7 +32,7 @@ public class ItemCatController
 	@ResponseBody
 	private List<EUTreeNode> getCatList(@RequestParam(value = "id", defaultValue = "0") Long parentId)
 	{
-		List<EUTreeNode> list = itemCatService.getCatList(parentId);
+		 List<EUTreeNode> list = itemCatService.getCatList(parentId);
 		return list;
 	}
 }
