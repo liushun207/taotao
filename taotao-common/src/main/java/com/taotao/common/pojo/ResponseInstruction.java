@@ -1,93 +1,156 @@
 package com.taotao.common.pojo;
 
+import org.joda.time.DateTime;
+
 import java.io.Serializable;
 
 /**
+ * 表示数据传输响应命令。
+ *
  * @param <T> 响应的结果对象。
- * @Author:曾智
- * @Description:用于请求之后数据结果的对象。
- * @CreatedTime 2017/7/23
  */
 public class ResponseInstruction<T> implements Serializable
 {
+    //#region 成员
+
     /**
-     * 响应代码。
+     * 状态码
      */
     private int code;
 
     /**
-     * 是否成功。
+     * 提示消息
      */
-    private boolean success;
-    /**
-     * 响应消息。
-     */
-    private String message;
-    /**
-     * 是否出错。
-     */
-    private boolean isError;
-    /**
-     * 响应结果。
-     */
-    private T Content;
+    public String message;
 
+    /**
+     * 服务器时间
+     */
+    public DateTime serverTime;
+
+    /**
+     * 响应内容
+     */
+    public T content;
+
+    //#endregion
+
+    //#region 构造函数
+
+    /**
+     * 构造函数
+     */
     public ResponseInstruction()
     {
+        this(ResponseStatus.SUCCESS, null);
     }
 
+    /**
+     * 构造函数
+     *
+     * @param content 响应内容
+     */
+    public ResponseInstruction(T content)
+    {
+        this(ResponseStatus.SUCCESS, content);
+    }
+
+    /**
+     * 构造函数
+     *
+     * @param status 响应状态
+     * @param content 响应内容
+     */
+    public ResponseInstruction(ResponseStatus status, T content)
+    {
+        this.code = status.getValue();
+        this.content = content;
+        this.serverTime = DateTime.now();
+    }
+
+    //#endregion
+
+    //#region getter/setter
+
+    /**
+     * Gets 状态码.
+     *
+     * @return 状态码
+     */
+    public Integer getCode()
+    {
+        return code;
+    }
+
+    /**
+     * Sets 状态码.
+     *
+     * @param code 状态码
+     */
+    public void setCode(Integer code)
+    {
+        this.code = code;
+    }
+
+    /**
+     * Gets 提示消息.
+     *
+     * @return 提示消息
+     */
     public String getMessage()
     {
         return message;
     }
 
+    /**
+     * Sets 提示消息.
+     *
+     * @param message 提示消息
+     */
     public void setMessage(String message)
     {
         this.message = message;
     }
 
-    public boolean isError()
+    /**
+     * Gets 服务器时间
+     *
+     * @return 服务器时间
+     */
+    public DateTime getServerTime()
     {
-        return isError;
+        return serverTime;
     }
 
-    public void setError(boolean error)
+    /**
+     * Sets 服务器时间
+     *
+     * @param serverTime 服务器时间
+     */
+    public void setServerTime(DateTime serverTime)
     {
-        isError = error;
+        this.serverTime = serverTime;
     }
 
-    public Boolean validate()
-    {
-        return null;
-    }
-
-    public boolean isSuccess()
-    {
-        return success;
-    }
-
-    public void setSuccess(boolean success)
-    {
-        this.success = success;
-    }
-
-    public int getCode()
-    {
-        return code;
-    }
-
-    public void setCode(int code)
-    {
-        this.code = code;
-    }
-
+    /**
+     * Gets 响应内容
+     *
+     * @return 响应内容
+     */
     public T getContent()
     {
-        return Content;
+        return content;
     }
 
+    /**
+     * Sets content.
+     *
+     * @param content 响应内容
+     */
     public void setContent(T content)
     {
-        Content = content;
+        this.content = content;
     }
+
+    //#endregion
 }
