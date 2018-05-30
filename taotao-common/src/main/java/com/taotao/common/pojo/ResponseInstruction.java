@@ -1,7 +1,9 @@
 package com.taotao.common.pojo;
 
+import com.taotao.common.utils.DateUtils;
 import org.joda.time.DateTime;
 
+import javax.xml.crypto.Data;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -22,17 +24,17 @@ public class ResponseInstruction<T> implements Serializable
     /**
      * 提示消息
      */
-    public String message;
+    private String message;
 
     /**
-     * 服务器时间
+     * 服务器时间 yyyy-MM-dd HH:mm:ss
      */
-    public Date serverTime;
+    private String serverTime;
 
     /**
      * 响应内容
      */
-    public T content;
+    private T content;
 
     //#endregion
 
@@ -66,7 +68,7 @@ public class ResponseInstruction<T> implements Serializable
     {
         this.code = status.getValue();
         this.content = content;
-        this.serverTime = new Date();
+        this.serverTime = DateUtils.getStringDate();
     }
 
     //#endregion
@@ -118,7 +120,7 @@ public class ResponseInstruction<T> implements Serializable
      *
      * @return 服务器时间
      */
-    public Date getServerTime()
+    public String getServerTime()
     {
         return serverTime;
     }
@@ -128,7 +130,7 @@ public class ResponseInstruction<T> implements Serializable
      *
      * @param serverTime 服务器时间
      */
-    public void setServerTime(Date serverTime)
+    public void setServerTime(String serverTime)
     {
         this.serverTime = serverTime;
     }
