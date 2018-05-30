@@ -31,7 +31,7 @@ public class MapperUtils
      * Mapper 映射列表.
      *
      * @param <T>     泛型类
-     * @param sources 源
+     * @param sources 源列表
      * @param clazz   描述类
      * @return 泛型实体结果列表
      */
