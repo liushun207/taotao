@@ -3,11 +3,11 @@ package com.taotao.controller;
 import com.taotao.common.annotations.Auth;
 import com.taotao.common.pojo.*;
 import com.taotao.common.utils.MapperUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.taotao.pojo.TbItem;
@@ -32,6 +32,11 @@ import java.util.Map;
 @Controller
 public class ItemController
 {
+    /**
+     * log4j 日志
+     */
+    private static Logger logger = Logger.getLogger(ItemController.class);
+
     @Autowired
     private ItemService itemService;
 
@@ -103,6 +108,23 @@ public class ItemController
         List<OrganTo> result =  MapperUtils.mapTo(orgs, OrganTo.class);
 
         ResponseInstruction<List<OrganTo>> response = new ResponseInstruction<>(result);
+        return response;
+    }
+
+    @RequestMapping(value = "/item/logger", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseInstruction<Boolean> logger() throws Exception
+    {
+        // 记录debug级别的信息
+        logger.debug("This is debug message.");
+
+        // 记录info级别的信息
+        logger.info("This is info message.");
+
+        // 记录error级别的信息
+        logger.error("This is error message.");
+
+        ResponseInstruction<Boolean> response = new ResponseInstruction<>();
         return response;
     }
 
