@@ -90,5 +90,12 @@
             <artifactId>javax.el</artifactId>
         </dependency>
         <!--验证 结束-->
+
+        <!-- modelmapper mapping实体映射 -->
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+        </dependency>
+
     </dependencies>
 </project>
