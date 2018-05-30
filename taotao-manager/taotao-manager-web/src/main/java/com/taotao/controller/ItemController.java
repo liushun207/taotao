@@ -1,7 +1,7 @@
 package com.taotao.controller;
 
 import com.taotao.common.annotations.Auth;
-import com.taotao.common.pojo.ItemObject;
+import com.taotao.common.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -9,8 +9,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.taotao.common.pojo.EUDataGridResult;
-import com.taotao.common.pojo.TaotaoResult;
 import com.taotao.pojo.TbItem;
 import com.taotao.service.ItemService;
 
@@ -75,17 +73,36 @@ public class ItemController
 		return result;
 	}
 
-	private Map<String, String> getErrors(BindingResult result)
-	{
-		Map<String, String> map = new HashMap<String, String>();
-		List<FieldError> list = result.getFieldErrors();
-		for (FieldError error : list)
-		{
-			System.out.println("error.getField():" + error.getField());
-			System.out.println("error.getDefaultMessage():" + error.getDefaultMessage());
+    @RequestMapping(value = "/item/validatable", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseInstruction<Boolean> ValidatableItem(@RequestBody RequestInstruction<ItemObject> item) throws Exception
+    {
+        ResponseInstruction<Boolean> response = new ResponseInstruction<Boolean>();
+        return response;
+    }
 
-			map.put(error.getField(), error.getDefaultMessage());
-		}
-		return map;
-	}
+	//region 私有
+
+    /**
+     * 获取错误
+     * @param result
+     * @return
+     */
+    private Map<String, String> getErrors(BindingResult result)
+    {
+        Map<String, String> map = new HashMap<String, String>();
+        List<FieldError> list = result.getFieldErrors();
+        for (FieldError error : list)
+        {
+            System.out.println("error.getField():" + error.getField());
+            System.out.println("error.getDefaultMessage():" + error.getDefaultMessage());
+
+            map.put(error.getField(), error.getDefaultMessage());
+        }
+        return map;
+    }
+
+	//endregion
+
+
 }

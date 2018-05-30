@@ -10,7 +10,21 @@
     <context:component-scan base-package="com.taotao.controller" />
 
     <!-- 快速应用默认配置 -->
-    <!--<mvc:annotation-driven />-->
+    <mvc:annotation-driven />
+
+    <!-- 参数验证拦截器 开始 -->
+    <bean id="validationInterceptor" class="com.taotao.interceptor.ValidationInterceptor">
+    </bean>
+
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="beanNames">
+            <list><value>*Controller</value></list>
+        </property>
+        <property name="interceptorNames">
+            <list><value>validationInterceptor</value></list>
+        </property>
+    </bean>
+    <!-- 参数验证拦截器 结束 -->
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/jsp/" />

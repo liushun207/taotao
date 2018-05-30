@@ -3,6 +3,7 @@ package com.taotao.common.pojo;
 import org.joda.time.DateTime;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 表示数据传输响应命令。
@@ -26,7 +27,7 @@ public class ResponseInstruction<T> implements Serializable
     /**
      * 服务器时间
      */
-    public DateTime serverTime;
+    public Date serverTime;
 
     /**
      * 响应内容
@@ -65,7 +66,7 @@ public class ResponseInstruction<T> implements Serializable
     {
         this.code = status.getValue();
         this.content = content;
-        this.serverTime = DateTime.now();
+        this.serverTime = new Date();
     }
 
     //#endregion
@@ -117,7 +118,7 @@ public class ResponseInstruction<T> implements Serializable
      *
      * @return 服务器时间
      */
-    public DateTime getServerTime()
+    public Date getServerTime()
     {
         return serverTime;
     }
@@ -127,7 +128,7 @@ public class ResponseInstruction<T> implements Serializable
      *
      * @param serverTime 服务器时间
      */
-    public void setServerTime(DateTime serverTime)
+    public void setServerTime(Date serverTime)
     {
         this.serverTime = serverTime;
     }

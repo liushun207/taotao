@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @version 1.0
  */
 @Controller
-@RequestMapping("/page")
 public class PageController
 {
 	/**

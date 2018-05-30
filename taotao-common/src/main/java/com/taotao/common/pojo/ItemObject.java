@@ -5,9 +5,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- *
+ *  测试对象
  **/
-public class ItemObject
+public class ItemObject extends DataObject
 {
     @NotNull(message = "名字不能为空")
     private String name;
