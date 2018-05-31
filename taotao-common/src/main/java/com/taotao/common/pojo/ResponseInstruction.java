@@ -45,7 +45,7 @@ public class ResponseInstruction<T> implements Serializable
      */
     public ResponseInstruction()
     {
-        this(ResponseStatus.SUCCESS, null);
+        this(ResponseStatus.SUCCESS, null, ResponseStatus.SUCCESS.getDescription());
     }
 
     /**
@@ -66,8 +66,21 @@ public class ResponseInstruction<T> implements Serializable
      */
     public ResponseInstruction(ResponseStatus status, T content)
     {
+        this(status, content, status.getDescription());
+    }
+
+    /**
+     * 构造函数
+     *
+     * @param status 响应状态
+     * @param content 响应内容
+     * @param message 响应消息
+     */
+    public ResponseInstruction(ResponseStatus status, T content, String message)
+    {
         this.code = status.getValue();
         this.content = content;
+        this.message = message.isEmpty() ? status.getDescription() : message;
         this.serverTime = DateUtils.getStringDate();
     }
 

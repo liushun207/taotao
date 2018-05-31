@@ -2,6 +2,7 @@ package com.taotao.common.utils;
 
 import java.util.List;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonUtils
 {
+    // region fasterxml.jackson
 
     // 定义jackson对象
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -82,4 +84,50 @@ public class JsonUtils
 
         return null;
     }
+
+    // endregion
+
+    // region alibaba.fastjson
+
+    /**
+     * 将对象转换成json字符串。
+     *
+     * @param data 数据
+     * @return json字符串
+     */
+    public static String serialize(Object data)
+    {
+        String result = JSON.toJSONString(data);
+        return result;
+    }
+
+    /**
+     * 将json结果集转化为对象
+     *
+     * @param <T>      泛型
+     * @param jsonData json数据
+     * @param beanType 对象中的object类型
+     * @return 泛型对象
+     */
+    public static <T> T deserialize(String jsonData, Class<T> beanType)
+    {
+        T result = JSON.parseObject(jsonData, beanType);
+        return result;
+    }
+
+    /**
+     * 将json数据转换成对象list
+     *
+     * @param <T>      泛型
+     * @param jsonData json数据
+     * @param beanType 对象中的object类型
+     * @return 泛型对象list
+     */
+    public static <T> List<T> deserializeArray(String jsonData, Class<T> beanType)
+    {
+        List<T> list = JSON.parseArray(jsonData, beanType);
+        return list;
+    }
+
+    // endregion
 }

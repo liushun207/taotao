@@ -1,6 +1,7 @@
 package com.taotao.controller;
 
 import com.taotao.common.annotations.Auth;
+import com.taotao.common.exceptions.BaseException;
 import com.taotao.common.pojo.*;
 import com.taotao.common.utils.MapperUtils;
 import org.apache.log4j.Logger;
@@ -124,8 +125,10 @@ public class ItemController
         // 记录error级别的信息
         logger.error("This is error message.");
 
-        ResponseInstruction<Boolean> response = new ResponseInstruction<>();
-        return response;
+        throw new BaseException("错误测试");
+
+        //ResponseInstruction<Boolean> response = new ResponseInstruction<>();
+        //return response;
     }
 
     //region 私有

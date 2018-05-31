@@ -12,6 +12,10 @@
     <!-- 快速应用默认配置 -->
     <mvc:annotation-driven />
 
+    <!-- 全局异常处理  -->
+    <bean id="globalExceptionResolver" class="com.taotao.common.exceptions.GlobalExceptionResolver">
+    </bean>
+
     <!-- 参数验证拦截器 开始 -->
     <bean id="validationInterceptor" class="com.taotao.interceptor.ValidationInterceptor">
     </bean>

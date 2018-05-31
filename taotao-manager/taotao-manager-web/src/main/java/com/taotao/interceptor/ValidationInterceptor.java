@@ -5,6 +5,7 @@ import com.taotao.common.pojo.ResponseInstruction;
 import com.taotao.common.pojo.ResponseStatus;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.apache.log4j.Logger;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -20,6 +21,7 @@ public class ValidationInterceptor implements MethodInterceptor
 {
     // region 成员
 
+    private static Logger logger = Logger.getLogger(ValidationInterceptor.class);
     private static ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 
     // endregion
@@ -83,9 +85,7 @@ public class ValidationInterceptor implements MethodInterceptor
                     // 如果有错误，固定返回类型
                     if (errors != null && !errors.isEmpty())
                     {
-                        ResponseInstruction<String> response = new ResponseInstruction<String>(ResponseStatus.VALIDATIONERROR, null);
-
-                        response.setMessage(errors.iterator().next());
+                        ResponseInstruction<String> response = new ResponseInstruction<String>(ResponseStatus.VALIDATIONERROR, errors.iterator().next());
 
                         return response;
                     }
@@ -94,10 +94,10 @@ public class ValidationInterceptor implements MethodInterceptor
         }
         catch (Exception e)
         {
-            ResponseInstruction<String> response = new ResponseInstruction<String>(ResponseStatus.SERVERERROR, null);
+            // 记录日志
+            logger.error(e.getMessage());
 
-            response.setMessage("方法参数校验失败！");
-
+            ResponseInstruction<String> response = new ResponseInstruction<String>(ResponseStatus.SERVERERROR, "方法参数校验失败！");
             return response;
         }
 

@@ -1,7 +1,11 @@
 package com.taotao.interceptor;
 
 import com.taotao.common.annotations.Auth;
+import com.taotao.common.pojo.ResponseInstruction;
+import com.taotao.common.pojo.ResponseStatus;
 import com.taotao.common.utils.CookieUtils;
+import com.taotao.common.utils.JsonUtils;
+import com.taotao.common.utils.ResponseUtils;
 import com.taotao.pojo.TbUser;
 import org.apache.commons.lang3.concurrent.ConcurrentRuntimeException;
 import org.springframework.web.method.HandlerMethod;
@@ -55,6 +59,12 @@ public class AuthInterceptor implements HandlerInterceptor
         //{
         //    throw new Exception("权限不足");
         //}
+
+        //ResponseInstruction<String> result = new ResponseInstruction<String>(ResponseStatus.UNAUTHORIZED, null);
+
+        // 发送响应
+        //ResponseUtils.renderJson(response, JsonUtils.serialize(result));
+
         return true;
     }
 
