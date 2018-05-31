@@ -80,7 +80,7 @@ public class ResponseInstruction<T> implements Serializable
     {
         this.code = status.getValue();
         this.content = content;
-        this.message = message.isEmpty() ? status.getDescription() : message;
+        this.message = message != null && !message.isEmpty() ? status.getDescription() : message;
         this.serverTime = DateUtils.getStringDate();
     }
 
