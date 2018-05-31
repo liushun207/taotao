@@ -139,7 +139,7 @@ public class UserServiceImpl implements UserService
 		user.setPassword(null);
 
 		//把用户信息写入redis
-		jedisClient.set(REDIS_USER_SESSION_KEY + ":" + token, JsonUtils.objectToJson(user));
+		jedisClient.set(REDIS_USER_SESSION_KEY + ":" + token, JsonUtils.serialize(user));
 		//设置session的过期时间
 		jedisClient.expire(REDIS_USER_SESSION_KEY + ":" + token, SSO_SESSION_EXPIRE);
 
@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService
 		//更新过期时间
 		jedisClient.expire(REDIS_USER_SESSION_KEY + ":" + token, SSO_SESSION_EXPIRE);
 		//返回用户信息
-		return TaotaoResult.ok(JsonUtils.jsonToPojo(json, TbUser.class));
+		return TaotaoResult.ok(JsonUtils.deserialize(json, TbUser.class));
 	}
 
 	@Override
@@ -182,7 +182,7 @@ public class UserServiceImpl implements UserService
 		jedisClient.expire(REDIS_USER_SESSION_KEY + ":" + token, SSO_SESSION_EXPIRE);
 
 		//返回用户信息
-		return JsonUtils.jsonToPojo(json, TbUser.class);
+		return JsonUtils.deserialize(json, TbUser.class);
 	}
 
 	@Override

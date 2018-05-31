@@ -44,7 +44,7 @@ public class ItemParamItemServiceImpl implements ItemParamItemService {
 		String paramData = itemParamItem.getParamData();
 		//生成html
 		// 把规格参数json数据转换成java对象
-		List<Map> jsonList = JsonUtils.jsonToList(paramData, Map.class);
+		List<Map> jsonList = JsonUtils.deserializeArray(paramData, Map.class);
 		StringBuffer sb = new StringBuffer();
 		sb.append("<table cellpadding=\"0\" cellspacing=\"1\" width=\"100%\" border=\"1\" class=\"Ptable\">\n");
 		sb.append("    <tbody>\n");
