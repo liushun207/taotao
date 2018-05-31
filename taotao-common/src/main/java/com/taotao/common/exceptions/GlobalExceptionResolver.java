@@ -30,7 +30,7 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
     {
         // 记录错误日志
-        logger.error(ex.toString());
+        logger.error(ex.getMessage(), ex);
 
         ResponseInstruction<String> result = new ResponseInstruction<String>(ResponseStatus.SERVERERROR, ex.getMessage());
 

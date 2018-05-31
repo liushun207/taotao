@@ -125,10 +125,12 @@ public class ItemController
         // 记录error级别的信息
         logger.error("This is error message.");
 
-        throw new BaseException("错误测试");
+        long a = 0;
 
-        //ResponseInstruction<Boolean> response = new ResponseInstruction<>();
-        //return response;
+        long b = 1 / a;
+
+        ResponseInstruction<Boolean> response = new ResponseInstruction<>();
+        return response;
     }
 
     //region 私有
