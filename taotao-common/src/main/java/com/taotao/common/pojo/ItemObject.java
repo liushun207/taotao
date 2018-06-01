@@ -12,7 +12,7 @@ public class ItemObject extends DataObject
     @NotNull(message = "名字不能为空")
     private String name;
 
-    @Size(min = 6, max = 30, message = "地址应该在6-30字符之间")
+    @Size(min = 6, max = 30, message = "地址应该在{min}-{max}字符之间")
     private String address;
 
     //@DecimalMax(value = "100.00", message = "体重有些超标哦")

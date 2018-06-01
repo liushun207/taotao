@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.taotao.pojo.TbItem;
@@ -69,7 +70,7 @@ public class ItemController
     @RequestMapping(value = "/item/vali", method = RequestMethod.POST)
     @ResponseBody
     // @RequestBody 标注为json格式
-    public TaotaoResult validatableItem(@Valid @RequestBody ItemObject item, BindingResult bingingresult) throws Exception
+    public TaotaoResult validatableItem(@Validated @RequestBody ItemObject item, BindingResult bingingresult) throws Exception
     {
         if (bingingresult.hasErrors())
         {
