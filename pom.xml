@@ -10,6 +10,7 @@
     <modules>
         <module>taotao-common</module>
         <module>taotao-manager</module>
+        <module>taotao-elasticsearch</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -41,9 +42,18 @@
         <hibername-validator.version>6.0.10.Final</hibername-validator.version>
         <modelmapper.version>2.0.0</modelmapper.version>
         <fastjson.version>1.2.47</fastjson.version>
+        <elasticsearch.version>6.2.4</elasticsearch.version>
     </properties>
     <dependencyManagement>
         <dependencies>
+            <!-- elasticsearch -->
+            <!-- https://mvnrepository.com/artifact/org.elasticsearch.client/transport -->
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>transport</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+
             <!-- 时间操作组件 -->
             <dependency>
                 <groupId>joda-time</groupId>
