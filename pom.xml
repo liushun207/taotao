@@ -47,6 +47,13 @@
     <dependencyManagement>
         <dependencies>
             <!-- elasticsearch -->
+            <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>${elasticsearch.version}</version>
+            </dependency>
+
             <!-- https://mvnrepository.com/artifact/org.elasticsearch.client/transport -->
             <dependency>
                 <groupId>org.elasticsearch.client</groupId>
