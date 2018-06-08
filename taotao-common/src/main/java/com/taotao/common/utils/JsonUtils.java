@@ -19,7 +19,7 @@ public class JsonUtils
 
     /**
      * fasterxml.jackson 将对象转换成json字符串。
-     * <p>Title: pojoToJson</p>
+     * <p>Title: objectToJson</p>
      * <p>Description: </p>
      *
      * @param data
@@ -30,6 +30,28 @@ public class JsonUtils
         try
         {
             String string = MAPPER.writeValueAsString(data);
+            return string;
+        }
+        catch (JsonProcessingException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * fasterxml.jackson 将对象转换成json字符串。
+     * <p>Title: objectToBytes</p>
+     * <p>Description: </p>
+     *
+     * @param data
+     * @return
+     */
+    public static byte[] objectToBytes(Object data)
+    {
+        try
+        {
+            byte[] string = MAPPER.writeValueAsBytes(data);
             return string;
         }
         catch (JsonProcessingException e)
