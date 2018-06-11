@@ -2,12 +2,10 @@ package com.taotao.elasticsearch;
 
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import java.io.Closeable;
@@ -65,7 +63,7 @@ public class ElasticsearchIndex implements Closeable
         Settings settings = Settings.builder()
                 // 索引名称
                 .put("cluster.name", indexName)
-                // 集群节点自动探查
+                // 集群节点自动探查, 去嗅探整个集群的状态，把集群中其它机器的ip地址加到客户端中
                 .put("client.transport.sniff", true)
                 .build();
 
@@ -74,20 +72,6 @@ public class ElasticsearchIndex implements Closeable
         // .put("client.transport.nodes_sampler_interval", true); 对列出和连接的节点进行`ping`的频率，默认5秒
 
         client = new PreBuiltTransportClient(settings);
-
-        String[] hostArr = host.split(",");
-
-        try
-        {
-            for (String uri : hostArr)
-            {
-                client.addTransportAddress(new TransportAddress(InetAddress.getByName(uri), 9300));
-            }
-        }
-        catch (UnknownHostException e)
-        {
-            e.printStackTrace();
-        }
     }
 
     // endregion
