@@ -11,6 +11,7 @@
 
     <!-- 快速应用默认配置 -->
     <mvc:annotation-driven />
+    <context:annotation-config/>
 
     <!-- 全局异常处理  -->
     <bean id="globalExceptionResolver" class="com.taotao.common.exceptions.GlobalExceptionResolver">
