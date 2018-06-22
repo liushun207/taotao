@@ -1,12 +1,13 @@
 package com.taotao.elasticsearch;
 
+import com.taotao.elasticsearch.common.BulkItem;
+import com.taotao.elasticsearch.common.BulkOperation;
 import org.apache.http.HttpHost;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.bulk.*;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -20,6 +21,9 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
@@ -27,7 +31,10 @@ import org.springframework.util.Assert;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.log4j.Logger;
 
 /**
  * ES搜索引擎基类
@@ -35,6 +42,11 @@ import java.util.Map;
 public class ElasticsearchIndex implements Closeable
 {
     // region 成员
+
+    /**
+     * log4j 日志
+     */
+    private static Logger logger = Logger.getLogger(ElasticsearchIndex.class);
 
     /**
      * 方案
@@ -78,15 +90,7 @@ public class ElasticsearchIndex implements Closeable
      */
     public ElasticsearchIndex(String host, String indexName)
     {
-        if(host == null || host.isEmpty())
-        {
-            throw new ElasticsearchException("搜索服务`host`不能为空");
-        }
-
-        if(indexName == null || indexName.isEmpty())
-        {
-            throw new ElasticsearchException("搜索服务索引名称`indexName`不能为空");
-        }
+        checkBaseInfo(host, indexName);
 
         this.host = host;
         this.indexName = indexName.toLowerCase();
@@ -98,16 +102,25 @@ public class ElasticsearchIndex implements Closeable
 
     // region 公共方法
 
+    // region 索引相关
+
     /**
      * 创建索引与 mapping 模板
      *
      * @param type    Mapping类型（文档类型）
-     * @param mapping mapping
-     * @return the create index response
+     * @param mapping 映射
+     * @return true 成功
      * @throws IOException the io exception
      */
-    public CreateIndexResponse createIndex(String type, XContentBuilder mapping) throws IOException
+    public boolean createIndex(String type, XContentBuilder mapping) throws IOException
     {
+        checkType(type);
+
+        if(mapping == null)
+        {
+            throw new ElasticsearchException("`mapping`映射不能为空");
+        }
+
         // 创建索引
         CreateIndexRequest request = new CreateIndexRequest(this.indexName);
 
@@ -123,7 +136,7 @@ public class ElasticsearchIndex implements Closeable
         // 创建
         CreateIndexResponse response = client.indices().create(request);
 
-        return response;
+        return true;
     }
 
     /**
@@ -163,7 +176,9 @@ public class ElasticsearchIndex implements Closeable
         return response;
     }
 
-    // region 增、删、改
+    // endregion
+
+    // region 文档相关 增、删、改
 
     /**
      * 新增一个文档.
@@ -176,29 +191,17 @@ public class ElasticsearchIndex implements Closeable
      */
     public boolean indexDocument(String type, String id, String source) throws IOException
     {
+        checkType(type);
+        checkType(id);
+        checkSource(source);
+
         IndexRequest request = new IndexRequest(this.indexName, type, id);
 
         request.source(source, XContentType.JSON);
 
         IndexResponse indexResponse = client.index(request);
 
-        ReplicationResponse.ShardInfo shardInfo = indexResponse.getShardInfo();
-
-        // 处理成功分片数量少于总分片数量的情况
-        if (shardInfo.getTotal() != shardInfo.getSuccessful())
-        {
-            throw new IOException("成功分片数量少于总分片数量");
-        }
-
-        if (shardInfo.getFailed() > 0)
-        {
-            // 处理潜在的失败
-            for (ReplicationResponse.ShardInfo.Failure failure : shardInfo.getFailures())
-            {
-                String reason = failure.reason();
-                throw new IOException(reason);
-            }
-        }
+        checkShard(indexResponse.getShardInfo());
 
         return true;
     }
@@ -213,27 +216,14 @@ public class ElasticsearchIndex implements Closeable
      */
     public boolean deleteDocument(String type, String id) throws IOException
     {
+        checkType(type);
+        checkType(id);
+
         DeleteRequest request = new DeleteRequest(this.indexName, type, id);
 
         DeleteResponse deleteResponse = client.delete(request);
 
-        ReplicationResponse.ShardInfo shardInfo = deleteResponse.getShardInfo();
-
-        // 处理成功分片数量少于总分片数量的情况
-        if (shardInfo.getTotal() != shardInfo.getSuccessful())
-        {
-            throw new IOException("成功分片数量少于总分片数量");
-        }
-
-        if (shardInfo.getFailed() > 0)
-        {
-            // 处理潜在的失败
-            for (ReplicationResponse.ShardInfo.Failure failure : shardInfo.getFailures())
-            {
-                String reason = failure.reason();
-                throw new IOException(reason);
-            }
-        }
+        checkShard(deleteResponse.getShardInfo());
 
         return true;
     }
@@ -249,13 +239,246 @@ public class ElasticsearchIndex implements Closeable
      */
     public boolean updageDocument(String type, String id, String source) throws IOException
     {
+        checkType(type);
+        checkType(id);
+        checkSource(source);
+
         UpdateRequest request = new UpdateRequest(this.indexName, type, id);
 
         request.doc(source, XContentType.JSON);
 
-        UpdateResponse updateResponse = client.update(request);
+        try
+        {
+            UpdateResponse updateResponse = client.update(request);
+
+            checkShard(updateResponse.getShardInfo());
+        }
+        catch (ElasticsearchException e)
+        {
+            if (e.status() == RestStatus.NOT_FOUND)
+            {
+                StringBuilder builder = new StringBuilder();
+                builder.append("更新的文档不存在；");
+                builder.append("索引：").append(this.indexName);
+                builder.append(",类型：").append(type);
+                builder.append(",id=").append(id);
+
+                throw new ElasticsearchException(builder.toString());
+            }
+        }
 
         return true;
+    }
+
+    /**
+     * 批量处理
+     *
+     * @param items 文档列表
+     * @return the bulk response
+     */
+    public BulkResponse bulk(List<BulkItem> items) throws IOException
+    {
+        if(items == null || items.isEmpty())
+        {
+            throw new ElasticsearchException("批量处理列表没有元素！");
+        }
+
+        BulkRequest request = new BulkRequest();
+
+        // region 批量处理
+
+        for (BulkItem bulkItem : items)
+        {
+            String id = bulkItem.getId();
+
+            if(id != null && !id.isEmpty())
+            {
+                BulkOperation operation = bulkItem.getOperation();
+                String source = bulkItem.getSource();
+                String type = bulkItem.getType();
+
+                switch(operation)
+                {
+                    case INDEX:
+                    {
+                        if(source == null || source.isEmpty())
+                        {
+                            continue;
+                        }
+
+                        IndexRequest indexRequest = new IndexRequest(this.indexName, type, id);
+
+                        indexRequest.source(source, XContentType.JSON);
+
+                        request.add(indexRequest);
+
+                        break;
+                    }
+                    case UPSERT:
+                    {
+                        if(source == null || source.isEmpty())
+                        {
+                            continue;
+                        }
+
+                        UpdateRequest updateRequest = new UpdateRequest(this.indexName, type, id);
+
+                        updateRequest.doc(source, XContentType.JSON);
+
+                        request.add(updateRequest);
+
+                        break;
+                    }
+                    case DELETE:
+                    {
+                        DeleteRequest deleteRequest = new DeleteRequest(this.indexName, type, id);
+
+                        request.add(deleteRequest);
+
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // endregion
+
+        BulkResponse bulkResponse = client.bulk(request);
+
+        for (BulkItemResponse bulkItemResponse : bulkResponse)
+        {
+            if (bulkItemResponse.isFailed())
+            {
+                BulkItemResponse.Failure failure = bulkItemResponse.getFailure();
+                logger.error("[es批量处理`bluk`错误信息]:" + failure.toString());
+            }
+        }
+
+        return bulkResponse;
+    }
+
+    /**
+     * 批量处理 （未完）
+     *
+     * @param items 文档列表
+     * @return the bulk response
+     */
+    public void bulkProcessor(List<BulkItem> items) throws IOException
+    {
+        if(items == null || items.isEmpty())
+        {
+            throw new ElasticsearchException("批量处理列表没有元素！");
+        }
+
+        BulkProcessor.Listener listener = new BulkProcessor.Listener()
+        {
+            @Override
+            public void beforeBulk(long executionId, BulkRequest request)
+            {
+                int numberOfActions = request.numberOfActions();
+                String message  ="---尝试处理[" + numberOfActions + "]条数据---";
+                logger.info(message);
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request, BulkResponse response)
+            {
+                int numberOfActions = request.numberOfActions();
+                String message  ="---尝试处理[" + numberOfActions + "]条数据成功---";
+                logger.info(message);
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request, Throwable failure)
+            {
+                logger.error("[es批量处理`bulkProcessor`错误信息]：" + failure.toString());
+            }
+        };
+
+        // 此processer的含义为如果消息数量到达500
+        // 或者消息大小到大1M 或者时间达到10s
+        // 任意条件满足，客户端就会把当前的数据提交到服务端处理。效率很高。
+        BulkProcessor.Builder builder = BulkProcessor.builder(client::bulkAsync, listener);
+
+        // 设置什么时候根据当前添加的动作数量来刷新一个新的批量请求（默认为1000，使用-1来禁用它）
+        builder.setBulkActions(500);
+
+        // 设置何时根据当前添加的动作的大小来刷新一个新的批量请求（默认为5 Mb，使用-1来禁用它）
+        builder.setBulkSize(new ByteSizeValue(1L, ByteSizeUnit.MB));
+
+        // 设定允许执行的并发请求的数量（默认为1，使用0只允许执行单个请求）
+        builder.setConcurrentRequests(0);
+
+        // 设置一个刷新间隔，在间隔通过时刷新任何容积请求（默认值不设置）
+        builder.setFlushInterval(TimeValue.timeValueSeconds(10L));
+
+        BulkProcessor processor = builder.build();
+
+        // region 批量处理
+
+        for (BulkItem bulkItem : items)
+        {
+            String id = bulkItem.getId();
+
+            if(id != null && !id.isEmpty())
+            {
+                BulkOperation operation = bulkItem.getOperation();
+                String source = bulkItem.getSource();
+                String type = bulkItem.getType();
+
+                switch(operation)
+                {
+                    case INDEX:
+                    {
+                        if(source == null || source.isEmpty())
+                        {
+                            continue;
+                        }
+
+                        IndexRequest indexRequest = new IndexRequest(this.indexName, type, id);
+
+                        indexRequest.source(source, XContentType.JSON);
+
+                        processor.add(indexRequest);
+
+                        break;
+                    }
+                    case UPSERT:
+                    {
+                        if(source == null || source.isEmpty())
+                        {
+                            continue;
+                        }
+
+                        UpdateRequest updateRequest = new UpdateRequest(this.indexName, type, id);
+
+                        updateRequest.doc(source, XContentType.JSON);
+
+                        processor.add(updateRequest);
+
+                        break;
+                    }
+                    case DELETE:
+                    {
+                        DeleteRequest deleteRequest = new DeleteRequest(this.indexName, type, id);
+
+                        processor.add(deleteRequest);
+
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // endregion
     }
 
     // endregion
@@ -272,6 +495,9 @@ public class ElasticsearchIndex implements Closeable
      */
     public String getDocument(String type, String id) throws IOException
     {
+        checkType(type);
+        checkType(id);
+
         GetRequest request = new GetRequest(this.indexName, type, id);
 
         try
@@ -357,6 +583,84 @@ public class ElasticsearchIndex implements Closeable
         RestClientBuilder builder = RestClient.builder(hosts);
 
         client = new RestHighLevelClient(builder);
+    }
+
+
+    /**
+     * 检查字段
+     * @param host 例如："localhost,192.168.1.200"
+     * @param indexName 索引名称
+     */
+    private void checkBaseInfo(String host, String indexName)
+    {
+        if(host == null || host.isEmpty())
+        {
+            throw new ElasticsearchException("搜索服务`host`不能为空");
+        }
+
+        if(indexName == null || indexName.isEmpty())
+        {
+            throw new ElasticsearchException("搜索服务索引名称`indexName`不能为空");
+        }
+    }
+
+    /**
+     * 检查字段
+     * @param id 文档Id
+     */
+    private void checkId(String id)
+    {
+        if(id == null || id.isEmpty())
+        {
+            throw new ElasticsearchException("文档Id不能为空");
+        }
+    }
+
+    /**
+     * 检查字段
+     * @param type 文档类型
+     */
+    private void checkType(String type)
+    {
+        if(type == null || type.isEmpty())
+        {
+            throw new ElasticsearchException("文档类型不能为空");
+        }
+    }
+
+    /**
+     * 检查字段
+     * @param source 文档数据
+     */
+    private void checkSource(String source)
+    {
+        if(source == null || source.isEmpty())
+        {
+            throw new ElasticsearchException("文档数据不能为空");
+        }
+    }
+
+    /**
+     * 检查碎片故障
+     * @param shardInfo
+     */
+    private void checkShard(ReplicationResponse.ShardInfo shardInfo)
+    {
+        // 处理成功分片数量少于总分片数量的情况
+        if (shardInfo.getTotal() != shardInfo.getSuccessful())
+        {
+            throw new ElasticsearchException("成功分片数量少于总分片数量");
+        }
+
+        if (shardInfo.getFailed() > 0)
+        {
+            // 处理潜在的失败
+            for (ReplicationResponse.ShardInfo.Failure failure : shardInfo.getFailures())
+            {
+                String reason = failure.reason();
+                throw new ElasticsearchException(reason);
+            }
+        }
     }
 
     // endregion

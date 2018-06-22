@@ -1,48 +1,26 @@
-package com.taotao.common.pojo;
-
-import java.rmi.ServerError;
+package com.taotao.elasticsearch.common;
 
 /**
- * 表示数据传输响应状态。
- */
-public enum ResponseStatus
+ * es 批量抄作类型
+ **/
+public enum BulkOperation
 {
     //#region 枚举
 
     /**
-     * 成功
+     * 索引
      */
-    SUCCESS(1, "成功"),
+    INDEX(1, "索引"),
 
     /**
-     * 失败
+     * 更新
      */
-    FAILURE(0, "失败"),
+    UPSERT(2, "更新"),
 
     /**
-     * 签名无效
+     * 删除
      */
-    INVALIDSIGN(-5, "签名无效"),
-
-    /**
-     * 参数无效
-     */
-    VALIDATIONERROR(-10, "参数无效"),
-
-    /**
-     * 服务端发生异常
-     */
-    SERVERERROR(-15, "服务端发生异常"),
-
-    /**
-     * 会话凭证丢失
-     */
-    SESSIONLOST(-20, "会话凭证丢失"),
-
-    /**
-     * 操作未授权
-     */
-    UNAUTHORIZED(-25, "操作未授权");
+    DELETE(3, "删除");
 
     //#endregion
 
@@ -60,7 +38,7 @@ public enum ResponseStatus
      * @param value 值
      * @param description 描述
      */
-    private ResponseStatus(int value, String description)
+    private BulkOperation(int value, String description)
     {
         this.value = value;
         this.description = description;
