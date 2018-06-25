@@ -2,7 +2,6 @@ package com.taotao.elasticsearch;
 
 import com.taotao.elasticsearch.common.BulkItem;
 import com.taotao.elasticsearch.common.BulkOperation;
-import org.apache.http.HttpHost;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -17,22 +16,16 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.support.replication.ReplicationResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.unit.ByteSizeUnit;
-import org.elasticsearch.common.unit.ByteSizeValue;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
-import org.springframework.util.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -49,11 +42,6 @@ public class ElasticsearchIndex implements Closeable
     private static Logger logger = Logger.getLogger(ElasticsearchIndex.class);
 
     /**
-     * 方案
-     */
-    private static String ES_SCHEME = "http";
-
-    /**
      * 分片数量
      */
     private static int NUMBER_OF_SHARDS = 5;
@@ -64,18 +52,14 @@ public class ElasticsearchIndex implements Closeable
     private static int NUMBER_OF_REPLICAS = 1;
 
     /**
-     * 服务地址 例如："localhost:9200, 192.168.1.200:9200"
-     */
-    private String host;
-
-    /**
      * 索引名称
      */
     private String indexName;
 
     /**
-     * es客户端
+     * es客户端，根据 ElasticsearchConfig 注入
      */
+    @Autowired
     private RestHighLevelClient client;
 
     // endregion
@@ -85,17 +69,13 @@ public class ElasticsearchIndex implements Closeable
     /**
      * 够着函数
      *
-     * @param host      例如："localhost,192.168.1.200"
      * @param indexName 索引名称，全小写
      */
-    public ElasticsearchIndex(String host, String indexName)
+    public ElasticsearchIndex(String indexName)
     {
-        checkBaseInfo(host, indexName);
+        checkIndexName(indexName);
 
-        this.host = host;
         this.indexName = indexName.toLowerCase();
-
-        initClient();
     }
 
     // endregion
@@ -192,7 +172,7 @@ public class ElasticsearchIndex implements Closeable
     public boolean indexDocument(String type, String id, String source) throws IOException
     {
         checkType(type);
-        checkType(id);
+        checkId(id);
         checkSource(source);
 
         IndexRequest request = new IndexRequest(this.indexName, type, id);
@@ -217,7 +197,7 @@ public class ElasticsearchIndex implements Closeable
     public boolean deleteDocument(String type, String id) throws IOException
     {
         checkType(type);
-        checkType(id);
+        checkId(id);
 
         DeleteRequest request = new DeleteRequest(this.indexName, type, id);
 
@@ -240,7 +220,7 @@ public class ElasticsearchIndex implements Closeable
     public boolean updageDocument(String type, String id, String source) throws IOException
     {
         checkType(type);
-        checkType(id);
+        checkId(id);
         checkSource(source);
 
         UpdateRequest request = new UpdateRequest(this.indexName, type, id);
@@ -374,49 +354,7 @@ public class ElasticsearchIndex implements Closeable
             throw new ElasticsearchException("批量处理列表没有元素！");
         }
 
-        BulkProcessor.Listener listener = new BulkProcessor.Listener()
-        {
-            @Override
-            public void beforeBulk(long executionId, BulkRequest request)
-            {
-                int numberOfActions = request.numberOfActions();
-                String message  ="---尝试处理[" + numberOfActions + "]条数据---";
-                logger.info(message);
-            }
-
-            @Override
-            public void afterBulk(long executionId, BulkRequest request, BulkResponse response)
-            {
-                int numberOfActions = request.numberOfActions();
-                String message  ="---尝试处理[" + numberOfActions + "]条数据成功---";
-                logger.info(message);
-            }
-
-            @Override
-            public void afterBulk(long executionId, BulkRequest request, Throwable failure)
-            {
-                logger.error("[es批量处理`bulkProcessor`错误信息]：" + failure.toString());
-            }
-        };
-
-        // 此processer的含义为如果消息数量到达500
-        // 或者消息大小到大1M 或者时间达到10s
-        // 任意条件满足，客户端就会把当前的数据提交到服务端处理。效率很高。
-        BulkProcessor.Builder builder = BulkProcessor.builder(client::bulkAsync, listener);
-
-        // 设置什么时候根据当前添加的动作数量来刷新一个新的批量请求（默认为1000，使用-1来禁用它）
-        builder.setBulkActions(500);
-
-        // 设置何时根据当前添加的动作的大小来刷新一个新的批量请求（默认为5 Mb，使用-1来禁用它）
-        builder.setBulkSize(new ByteSizeValue(1L, ByteSizeUnit.MB));
-
-        // 设定允许执行的并发请求的数量（默认为1，使用0只允许执行单个请求）
-        builder.setConcurrentRequests(0);
-
-        // 设置一个刷新间隔，在间隔通过时刷新任何容积请求（默认值不设置）
-        builder.setFlushInterval(TimeValue.timeValueSeconds(10L));
-
-        BulkProcessor processor = builder.build();
+        BulkProcessor processor = ElasticsearchBulkProcessor.getInstance();
 
         // region 批量处理
 
@@ -496,7 +434,7 @@ public class ElasticsearchIndex implements Closeable
     public String getDocument(String type, String id) throws IOException
     {
         checkType(type);
-        checkType(id);
+        checkId(id);
 
         GetRequest request = new GetRequest(this.indexName, type, id);
 
@@ -557,47 +495,11 @@ public class ElasticsearchIndex implements Closeable
     // region 私有方法
 
     /**
-     * 初始化client
-     */
-    private void initClient()
-    {
-        String[] hostArr = host.split(",");
-
-        int len = hostArr.length;
-
-        HttpHost[] hosts = new HttpHost[len];
-
-        for (int i = 0; i < len; i++)
-        {
-            String[] uriArr = hostArr[i].split(":");
-
-            String hostName = uriArr[0];
-            String port =  uriArr[1];
-
-            Assert.hasText(hostName, "[Assertion failed] missing host name in 'clusterNodes'");
-            Assert.hasText(port, "[Assertion failed] missing port in 'clusterNodes'");
-
-            hosts[i] = new HttpHost(hostName, Integer.valueOf(port), ES_SCHEME);
-        }
-
-        RestClientBuilder builder = RestClient.builder(hosts);
-
-        client = new RestHighLevelClient(builder);
-    }
-
-
-    /**
      * 检查字段
-     * @param host 例如："localhost,192.168.1.200"
      * @param indexName 索引名称
      */
-    private void checkBaseInfo(String host, String indexName)
+    private void checkIndexName(String indexName)
     {
-        if(host == null || host.isEmpty())
-        {
-            throw new ElasticsearchException("搜索服务`host`不能为空");
-        }
-
         if(indexName == null || indexName.isEmpty())
         {
             throw new ElasticsearchException("搜索服务索引名称`indexName`不能为空");
@@ -666,16 +568,6 @@ public class ElasticsearchIndex implements Closeable
     // endregion
 
     // region getter/setter
-
-    /**
-     * Gets host.
-     *
-     * @return the host
-     */
-    public String getHost()
-    {
-        return host;
-    }
 
     /**
      * Gets index name.
