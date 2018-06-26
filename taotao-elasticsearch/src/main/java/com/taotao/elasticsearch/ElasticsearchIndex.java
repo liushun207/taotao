@@ -3,6 +3,7 @@ package com.taotao.elasticsearch;
 import com.taotao.elasticsearch.common.BulkItem;
 import com.taotao.elasticsearch.common.BulkOperation;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
@@ -342,7 +343,7 @@ public class ElasticsearchIndex implements Closeable
     }
 
     /**
-     * 批量处理 （未完）
+     * 批量处理
      *
      * @param items 文档列表
      * @return the bulk response
@@ -462,6 +463,23 @@ public class ElasticsearchIndex implements Closeable
 
             throw e;
         }
+    }
+
+    // endregion
+
+    // region 其它
+
+    /**
+     * 调用 ES 获取 IK 分词后结果
+     *
+     * @param keyword
+     * @return
+     */
+    public List<String> getIkAnalyzeSearchTerms(String keyword)
+    {
+
+
+        return  null;
     }
 
     // endregion
