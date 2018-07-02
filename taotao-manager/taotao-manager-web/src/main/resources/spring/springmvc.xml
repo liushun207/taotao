@@ -7,11 +7,13 @@
         http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:component-scan base-package="com.taotao.controller" />
-
     <!-- 快速应用默认配置 -->
     <mvc:annotation-driven />
+
+    <!-- 启用spring mvc 注解 -->
     <context:annotation-config/>
+
+    <context:component-scan base-package="com.taotao.controller" />
 
     <!-- 全局异常处理  -->
     <bean id="globalExceptionResolver" class="com.taotao.common.exceptions.GlobalExceptionResolver">
