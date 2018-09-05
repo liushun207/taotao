@@ -42,7 +42,10 @@
         <hibername-validator.version>6.0.10.Final</hibername-validator.version>
         <modelmapper.version>2.0.0</modelmapper.version>
         <fastjson.version>1.2.47</fastjson.version>
+        <!--es配套-->
         <elasticsearch.version>6.2.4</elasticsearch.version>
+        <lucene.version>7.2.1</lucene.version>
+        <!--es配套-->
     </properties>
 	
 	<!--如果父pom使用 <dependencies>....</dependencies>方式，则子pom会自动使用pom中的jar包，
@@ -50,6 +53,14 @@
 		这时如果子pom想使用的话，就要给出groupId和artifactId，无需给出version -->
     <dependencyManagement>
         <dependencies>
+
+            <!--es配套-->
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+
             <!-- elasticsearch -->
             <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
             <dependency>
@@ -75,6 +86,7 @@
                 <artifactId>elasticsearch-rest-high-level-client</artifactId>
                 <version>${elasticsearch.version}</version>
             </dependency>
+            <!--es配套-->
 
             <!-- 时间操作组件 -->
             <dependency>
