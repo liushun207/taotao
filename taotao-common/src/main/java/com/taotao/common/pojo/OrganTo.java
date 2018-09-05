@@ -7,34 +7,34 @@ package com.taotao.common.pojo;
  **/
 public class OrganTo
 {
-    /***
-     * 机构名称
-     */
-    private String name;
+	/***
+	 * 机构名称
+	 */
+	private String name;
 
-    /***
-     * 机构Code
+	/***
+	 * 机构Code
 
-     */
-    private String code;
+	 */
+	private String code;
 
-    public String getName()
-    {
-        return name;
-    }
+	public String getName()
+	{
+		return name;
+	}
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+	public void setName(String name)
+	{
+		this.name = name;
+	}
 
-    public String getCode()
-    {
-        return code;
-    }
+	public String getCode()
+	{
+		return code;
+	}
 
-    public void setCode(String code)
-    {
-        this.code = code;
-    }
+	public void setCode(String code)
+	{
+		this.code = code;
+	}
 }
