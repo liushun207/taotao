@@ -24,6 +24,10 @@ public class JedisController
 
     private String key = "test";
 
+    /**
+     * Sets jedis.
+     * @return the jedis
+     */
     @RequestMapping("/jedis/set")
     @ResponseBody
     public Boolean setJedis()
@@ -34,6 +38,10 @@ public class JedisController
         return true;
     }
 
+    /**
+     * Gets jedis.
+     * @return the jedis
+     */
     @RequestMapping("/jedis/get")
     @ResponseBody
     public String getJedis()
